@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Школьное питание</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #e8e8e8;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .main-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-right: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            background: #f8f9fa;
+        }
+
+        .sidebar-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .student-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .student-photo {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #4A90E2, #7B68EE);
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .student-details h3 {
+            color: #333;
+            font-size: 13px;
+            margin-bottom: 3px;
+            font-weight: 600;
+        }
+
+        .class-info {
+            color: #666;
+            font-size: 11px;
+        }
+
+        .menu-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .menu-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            font-size: 13px;
+            color: #333;
+            transition: background-color 0.2s;
+        }
+
+        .menu-item:hover {
+            background: #f8f9fa;
+        }
+
+        .menu-item.active {
+            background: #e3f2fd;
+            color: #1976d2;
+            font-weight: 500;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            height: 60px;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            color: white;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px;
+            padding: 8px 12px;
+            width: 300px;
+        }
+
+        .search-container input {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 14px;
+            width: 100%;
+            outline: none;
+        }
+
+        .search-container input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .search-icon {
+            margin-right: 8px;
+            opacity: 0.7;
+        }
+
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .control-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.2s;
+        }
+
+        .control-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .categories-grid {
+            flex: 1;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            overflow-y: auto;
+        }
+
+        .category-card {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .category-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        .category-title {
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 4px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .category-count {
+            font-size: 11px;
+            opacity: 0.9;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        /* Цвета категорий как в макете */
+        .cat-main { background: linear-gradient(135deg, #8B1538, #A91B47); }
+        .cat-sauces { background: linear-gradient(135deg, #C41E3A, #DC143C); }
+        .cat-desserts { background: linear-gradient(135deg, #20B2AA, #48D1CC); }
+        .cat-drinks { background: linear-gradient(135deg, #4682B4, #5F9EA0); }
+
+        .cat-fruits { background: linear-gradient(135deg, #1E90FF, #4169E1); }
+        .cat-garnish { background: linear-gradient(135deg, #9932CC, #8A2BE2); }
+        .cat-combo { background: linear-gradient(135deg, #2F4F4F, #708090); }
+        .cat-salads { background: linear-gradient(135deg, #32CD32, #00FF32); }
+
+        .cat-hot-drinks { background: linear-gradient(135deg, #FF6347, #FF4500); }
+        .cat-chocolate { background: linear-gradient(135deg, #DAA520, #FFD700); }
+        .cat-dairy { background: linear-gradient(135deg, #FFA500, #FF8C00); }
+        .cat-meals { background: linear-gradient(135deg, #9370DB, #8A2BE2); }
+
+        .cat-coffee { background: linear-gradient(135deg, #8B4513, #A0522D); }
+        .cat-beverages { background: linear-gradient(135deg, #20B2AA, #48D1CC); }
+        .cat-pastry { background: linear-gradient(135deg, #FF6347, #FF4500); }
+        .cat-hot-food { background: linear-gradient(135deg, #696969, #808080); }
+
+        .bottom-bar {
+            height: 50px;
+            background: #2c3e50;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            color: white;
+            font-size: 12px;
+        }
+
+        .balance-info {
+            display: flex;
+            gap: 20px;
+        }
+
+        .payment-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .payment-btn {
+            background: #3498db;
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .payment-btn.cash {
+            background: #95a5a6;
+        }
+
+        /* Modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            width: 400px;
+            max-width: 90vw;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+        }
+
+        .success-icon {
+            width: 60px;
+            height: 60px;
+            background: #4CAF50;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            color: white;
+            font-size: 24px;
+        }
+
+        .modal-text {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .modal-btn.primary {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .modal-btn.secondary {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+
+            .categories-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="main-container">
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Питание</div>
+            <div class="student-info">
+                <div class="student-photo">А</div>
+                <div class="student-details">
+                    <h3>Касымбекова Анель</h3>
+                    <div class="class-info">7вл-при бизнестандарте<br>Класс: 1А</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="menu-list">
+            <div class="menu-item active">Категории</div>
+            <div class="menu-item">Основное меню</div>
+            <div class="menu-item">Соусы</div>
+            <div class="menu-item">Десерты</div>
+            <div class="menu-item">Холодные напитки</div>
+            <div class="menu-item">Фрукты</div>
+            <div class="menu-item">Гарниры</div>
+            <div class="menu-item">Комбо</div>
+            <div class="menu-item">Салаты</div>
+            <div class="menu-item">Горячие напитки</div>
+            <div class="menu-item">Шоколады</div>
+            <div class="menu-item">Молочные продукты</div>
+            <div class="menu-item">Завтраки и обеды</div>
+            <div class="menu-item">Кофе</div>
+            <div class="menu-item">Безалкогольные</div>
+            <div class="menu-item">Сладкая выпечка</div>
+            <div class="menu-item">Горячие блюда</div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="top-bar">
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" placeholder="Поиск">
+            </div>
+
+            <div class="user-controls">
+                <button class="control-btn">Настройки</button>
+                <button class="control-btn">Профиль</button>
+                <button class="control-btn">Выход</button>
+            </div>
+        </div>
+
+        <div class="categories-grid">
+            <div class="category-card cat-main" onclick="openCategory('Основное меню', 16)">
+                <div class="category-icon">🍽️</div>
+                <div class="category-title">Основное меню</div>
+                <div class="category-count">16 позиций</div>
+            </div>
+
+            <div class="category-card cat-sauces" onclick="openCategory('Соусы', 4)">
+                <div class="category-icon">🥫</div>
+                <div class="category-title">Соусы</div>
+                <div class="category-count">4 позиции</div>
+            </div>
+
+            <div class="category-card cat-desserts" onclick="openCategory('Десерты', 3)">
+                <div class="category-icon">🍰</div>
+                <div class="category-title">Десерты</div>
+                <div class="category-count">3 позиции</div>
+            </div>
+
+            <div class="category-card cat-drinks" onclick="openCategory('Холодные напитки', 4)">
+                <div class="category-icon">🥤</div>
+                <div class="category-title">Холодные напитки</div>
+                <div class="category-count">4 позиции</div>
+            </div>
+
+            <div class="category-card cat-fruits" onclick="openCategory('Фрукты', 6)">
+                <div class="category-icon">🍎</div>
+                <div class="category-title">Фрукты</div>
+                <div class="category-count">6 позиций</div>
+            </div>
+
+            <div class="category-card cat-garnish" onclick="openCategory('Гарниры', 6)">
+                <div class="category-icon">🍟</div>
+                <div class="category-title">Гарниры</div>
+                <div class="category-count">6 позиций</div>
+            </div>
+
+            <div class="category-card cat-combo" onclick="openCategory('Комбо', 4)">
+                <div class="category-icon">🍱</div>
+                <div class="category-title">Комбо</div>
+                <div class="category-count">4 позиции</div>
+            </div>
+
+            <div class="category-card cat-salads" onclick="openCategory('Салаты', 6)">
+                <div class="category-icon">🥗</div>
+                <div class="category-title">Салаты</div>
+                <div class="category-count">6 позиций</div>
+            </div>
+
+            <div class="category-card cat-hot-drinks" onclick="openCategory('Горячие напитки', 2)">
+                <div class="category-icon">☕</div>
+                <div class="category-title">Горячие напитки</div>
+                <div class="category-count">2 позиции</div>
+            </div>
+
+            <div class="category-card cat-chocolate" onclick="openCategory('Шоколады', 7)">
+                <div class="category-icon">🍫</div>
+                <div class="category-title">Шоколады</div>
+                <div class="category-count">7 позиций</div>
+            </div>
+
+            <div class="category-card cat-dairy" onclick="openCategory('Молочные продукты', 8)">
+                <div class="category-icon">🥛</div>
+                <div class="category-title">Молочные продукты</div>
+                <div class="category-count">8 позиций</div>
+            </div>
+
+            <div class="category-card cat-meals" onclick="openCategory('Завтраки и обеды', 13)">
+                <div class="category-icon">🍳</div>
+                <div class="category-title">Завтраки и обеды</div>
+                <div class="category-count">13 позиций</div>
+            </div>
+
+            <div class="category-card cat-coffee" onclick="openCategory('Кофе', 1)">
+                <div class="category-icon">☕</div>
+                <div class="category-title">Кофе</div>
+                <div class="category-count">1 позиция</div>
+            </div>
+
+            <div class="category-card cat-beverages" onclick="openCategory('Безалкогольные напитки', 5)">
+                <div class="category-icon">💧</div>
+                <div class="category-title">Безалкогольные напитки</div>
+                <div class="category-count">5 позиций</div>
+            </div>
+
+            <div class="category-card cat-pastry" onclick="openCategory('Сладкая выпечка', 3)">
+                <div class="category-icon">🧁</div>
+                <div class="category-title">Сладкая выпечка</div>
+                <div class="category-count">3 позиции</div>
+            </div>
+
+            <div class="category-card cat-hot-food" onclick="openCategory('Горячие блюда', 8)">
+                <div class="category-icon">🍲</div>
+                <div class="category-title">Горячие блюда</div>
+                <div class="category-count">8 позиций</div>
+            </div>
+        </div>
+
+        <div class="bottom-bar">
+            <div class="balance-info">
+                <span>Баланс: 9460 ТГ</span>
+                <span>К доплате: 1700 ТГ</span>
+                <span>Итого к оплате: 4070 ТГ</span>
+            </div>
+
+            <div class="payment-buttons">
+                <button class="payment-btn" onclick="showPaymentSuccess()">Безналичная карта</button>
+                <button class="payment-btn cash" onclick="showPaymentSuccess()">Наличные</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal окно успешной оплаты -->
+<div class="modal-overlay" id="paymentModal">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title">Оплата</div>
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="success-icon">✓</div>
+        <div class="modal-text">Платеж успешно обработан!</div>
+        <div class="modal-actions">
+            <button class="modal-btn primary" onclick="closeModal()">ОК</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Функция открытия категории
+    function openCategory(categoryName, itemCount) {
+        alert(`Открываем категорию: ${categoryName}\nКоличество позиций: ${itemCount}`);
+    }
+
+    // Функция показа модального окна успешной оплаты
+    function showPaymentSuccess() {
+        document.getElementById('paymentModal').style.display = 'flex';
+    }
+
+    // Функция закрытия модального окна
+    function closeModal() {
+        document.getElementById('paymentModal').style.display = 'none';
+    }
+
+    // Поиск по категориям
+    document.querySelector('.search-container input').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        document.querySelectorAll('.category-card').forEach(card => {
+            const title = card.querySelector('.category-title').textContent.toLowerCase();
+            if (title.includes(searchTerm)) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = searchTerm === '' ? 'flex' : 'none';
+            }
+        });
+    });
+
+    // Активное меню в сайдбаре
+    document.querySelectorAll('.menu-item').forEach(item => {
+        item.addEventListener('click', function() {
+            document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+
+    // Закрытие модального окна по клику вне его
+    document.getElementById('paymentModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+</script>
+</body>
+</html>
