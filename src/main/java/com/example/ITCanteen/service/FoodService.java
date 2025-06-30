@@ -49,7 +49,7 @@ public class FoodService {
         foodRepository.deleteById(id);
     }
 
-    public Optional<Category> findByCategoryId(Long categoryId) {
-        return categoryRepository.findCategoryById(categoryId);
+    public List<Food> findByCategoryId(Long categoryId) {
+        return foodRepository.findByCategory_Id(categoryId);
     }
 }

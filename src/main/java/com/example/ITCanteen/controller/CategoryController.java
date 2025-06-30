@@ -2,6 +2,7 @@ package com.example.ITCanteen.controller;
 
 import com.example.ITCanteen.model.Category;
 import com.example.ITCanteen.service.CategoryService;
+import com.example.ITCanteen.dto.CategoryWithCountDto;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.common.errors.ResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
@@ -42,5 +43,10 @@ public class CategoryController {
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/with-count")
+    public List<CategoryWithCountDto> getCategoriesWithCount() {
+        return categoryService.getCategoriesWithCount();
     }
 }

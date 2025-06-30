@@ -47,7 +47,7 @@ public class FoodController {
     }
 
     @GetMapping("/category/{categoryId}")
-    public ResponseEntity<Optional<Category>> getFoodsByCategoryId(@PathVariable Long categoryId) {
+    public ResponseEntity<List<Food>> getFoodsByCategoryId(@PathVariable Long categoryId) {
         return ResponseEntity.ok(foodService.findByCategoryId(categoryId));
     }
 }
