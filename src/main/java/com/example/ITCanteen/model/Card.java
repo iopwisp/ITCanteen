@@ -3,8 +3,9 @@ package com.example.ITCanteen.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
+
+import javax.validation.constraints.PositiveOrZero;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -12,15 +13,18 @@ import org.hibernate.type.SqlTypes;
 @Table(name = "card")
 public class Card {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @PositiveOrZero(message = "Баланс не может быть отрицательным")
     @Column(name = "balance", nullable = false)
-    @JdbcTypeCode(SqlTypes.INTEGER)
-    private int balance;
+    private double balance;
 
     @OneToOne(orphanRemoval = true)
     @JoinColumn(name = "student_id")
     private Student student;
 
+    @Column(name = "created_date")
+    private LocalDateTime createdDate;
 }

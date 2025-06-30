@@ -3,9 +3,9 @@ package com.example.ITCanteen.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -14,18 +14,25 @@ import java.util.List;
 @Table(name = "orders")
 public class Order {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "order_time", nullable = false)
-    @JdbcTypeCode(SqlTypes.DATE)
-    private String orderTime;
-
     @ManyToOne
-    @JoinColumn(name = "student_id")
+    @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
-    @ManyToMany
-    private List<Food> foods;
+    @Column(name = "order_time", nullable = false)
+    private LocalDateTime orderTime;
+
+    @Column(name = "total_price", nullable = false)
+    private double totalPrice;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private OrderStatus status;
+
+    @Column(name = "items")
+    private String items;
 
 }

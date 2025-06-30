@@ -3,8 +3,9 @@ package com.example.ITCanteen.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
 
 @Getter
 @Setter
@@ -12,18 +13,23 @@ import org.hibernate.type.SqlTypes;
 @Table(name = "food")
 public class Food {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @NotBlank(message = "Название не может быть пустым")
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "price")
-    @JdbcTypeCode(SqlTypes.INTEGER)
-    private int price;
+    @Positive(message = "Цена должна быть положительной")
+    @Column(name = "price", nullable = false)
+    private double price;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
 
+    public Category getCategoryId() {
+        return category;
+    }
 }

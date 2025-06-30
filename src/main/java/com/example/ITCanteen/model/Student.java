@@ -20,4 +20,5 @@ public class Student {
     @JoinColumn(name = "card_id")
     private Card card;
 
+
 }

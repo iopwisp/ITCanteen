@@ -1,6 +1,5 @@
 package com.example.ITCanteen.controller;
 
-
 import com.example.ITCanteen.dto.OrderRequest;
 import com.example.ITCanteen.model.Order;
 import com.example.ITCanteen.service.OrderService;
@@ -8,24 +7,34 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/orders")
 @RequiredArgsConstructor
-@RequestMapping("/orders")
 public class CanteenController {
 
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<Order> createOrder(@RequestBody OrderRequest request){
-        Order order = orderService.createOrder(request);
-        return ResponseEntity.ok(order);
+    public ResponseEntity<Order> createOrder(@Valid @RequestBody OrderRequest request) {
+        return ResponseEntity.ok(orderService.createOrder(request));
     }
 
-    @GetMapping("/{studentId}") //order story
-    public ResponseEntity<List<Order>> getOrderStory(@PathVariable Long studentId){
+    @GetMapping("/student/{studentId}")
+    public ResponseEntity<List<Order>> getOrderHistory(@PathVariable Long studentId) {
         return ResponseEntity.ok(orderService.getOrderByStudentId(studentId));
     }
 
+    @GetMapping
+    public ResponseEntity<List<Order>> getAllOrders() {
+        return ResponseEntity.ok(orderService.getAllOrders());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> cancelOrder(@PathVariable Long id) {
+        orderService.cancelOrder(id);
+        return ResponseEntity.noContent().build();
+    }
 }
